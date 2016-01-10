@@ -23,15 +23,12 @@ class MemoryWatcher:
 
     def __next__(self):
         """Blocks until it has read a pair: (address, value).
-        
+
         address is the string provided by dolphin, set in Locations.txt.
-        value is a raw byte string, suitable for interpretation with struct.
-        
+        value is a four-byte string suitable for interpretation with struct.
+
         """
-        try:
-            data = self.sock.recvfrom(1024)[0].decode('utf-8').splitlines()
-        except OSError:
-            raise StopIteration
+        data = self.sock.recvfrom(1024)[0].decode('utf-8').splitlines()
         assert len(data) == 2
         # Strip the null terminator, pad with zeros, then convert to bytes
         return data[0], binascii.unhexlify(data[1].strip('\x00').zfill(8))
