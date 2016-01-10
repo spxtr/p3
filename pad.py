@@ -54,10 +54,10 @@ class Pad:
         """Press a trigger. Amount is in [0, 1], with 0 as released."""
         assert trigger in Trigger
         assert 0 <= amount <= 1
-        self.pipe.write('SET {} {:.2}\n'.format(trigger.name, amount))
+        self.pipe.write('SET {} {:.2f}\n'.format(trigger.name, amount))
 
     def tilt_stick(self, stick, x, y):
         """Tilt a stick. x and y are in [0, 1], with 0.5 as neutral."""
         assert stick in Stick
         assert 0 <= x <= 1 and 0 <= y <= 1
-        self.pipe.write('SET {} {:.2} {:.2}\n'.format(stick.name, x, y))
+        self.pipe.write('SET {} {:.2f} {:.2f}\n'.format(stick.name, x, y))
