@@ -1,6 +1,7 @@
 import os
-import pad
 import unittest
+
+import p3.pad as pad
 
 class PadTest(unittest.TestCase):
     def setUp(self):

@@ -1,7 +1,8 @@
 import os
-import mw
 import socket
 import unittest
+
+import p3.mw as mw
 
 class MemoryWatcherTest(unittest.TestCase):
     def setUp(self):
