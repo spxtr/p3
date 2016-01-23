@@ -11,6 +11,7 @@ class MemoryWatcher:
         except OSError:
             pass
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        self.sock.settimeout(0.001)
         self.sock.bind(path)
 
     def __iter__(self):
@@ -22,13 +23,15 @@ class MemoryWatcher:
         self.sock.close()
 
     def __next__(self):
-        """Blocks until it has read a pair: (address, value).
+        """Returns the next (address, value) tuple, or None on timeout.
 
         address is the string provided by dolphin, set in Locations.txt.
         value is a four-byte string suitable for interpretation with struct.
-
         """
-        data = self.sock.recvfrom(1024)[0].decode('utf-8').splitlines()
+        try:
+            data = self.sock.recvfrom(1024)[0].decode('utf-8').splitlines()
+        except socket.timeout:
+            return None
         assert len(data) == 2
         # Strip the null terminator, pad with zeros, then convert to bytes
         return data[0], binascii.unhexlify(data[1].strip('\x00').zfill(8))

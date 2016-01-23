@@ -24,6 +24,9 @@ class MemoryWatcherTest(unittest.TestCase):
         self.assertEqual(next(gen), ('4567', b'\x34\x00\x00\x00'))
         self.assertEqual(next(gen), ('89AB', b'\x56\x00\x00\x00'))
 
+    def test_timeout(self):
+        self.assertIsNone(next(self.mw))
+
     def tearDown(self):
         self.sock.close()
         del self.mw
