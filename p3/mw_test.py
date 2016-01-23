@@ -18,11 +18,15 @@ class MemoryWatcherTest(unittest.TestCase):
         self.sock.sendto(b'0123\n12000000\0', self.sock_path)
         self.sock.sendto(b'4567\n34000000\0', self.sock_path)
         self.sock.sendto(b'89AB\n56000000\0', self.sock_path)
-        # It blocks if we try to read past the end, so limit to three
-        gen = ((addr, value) for _, (addr, value) in zip(range(3), self.mw))
-        self.assertEqual(next(gen), ('0123', b'\x12\x00\x00\x00'))
-        self.assertEqual(next(gen), ('4567', b'\x34\x00\x00\x00'))
-        self.assertEqual(next(gen), ('89AB', b'\x56\x00\x00\x00'))
+
+        expecteds = [
+            ('0123', b'\x12\x00\x00\x00'),
+            ('4567', b'\x34\x00\x00\x00'),
+            ('89AB', b'\x56\x00\x00\x00'),
+            ]
+
+        for actual, expected in zip(self.mw, expecteds):
+            self.assertEqual(actual, expected)
 
     def test_timeout(self):
         self.assertIsNone(next(self.mw))

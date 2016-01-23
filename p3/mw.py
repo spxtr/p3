@@ -3,7 +3,12 @@ import os
 import socket
 
 class MemoryWatcher:
-    """Reads and parses game memory changes."""
+    """Reads and parses game memory changes.
+
+    Pass the location of the socket to the constructor, then either manually
+    call next() on this class to get a single change, or else use it like a
+    normal iterator.
+    """
     def __init__(self, path):
         """Creates the socket if it does not exist, and then opens it."""
         try:
