@@ -2,7 +2,7 @@ import os
 import socket
 import unittest
 
-from p3.mw import MemoryWatcher
+from p3.memory_watcher import MemoryWatcher
 
 class MemoryWatcherTest(unittest.TestCase):
     def setUp(self):
@@ -10,11 +10,11 @@ class MemoryWatcherTest(unittest.TestCase):
         self.mw = MemoryWatcher(self.sock_path)
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
 
-    def test_recv(self):
+    def test_memory_watcher_recv(self):
         self.sock.sendto(b'DEAD BEEF\n15\0', self.sock_path)
         self.assertEqual(next(self.mw), ('DEAD BEEF', b'\x00\x00\x00\x15'))
 
-    def test_iter(self):
+    def test_memory_watcher_iter(self):
         self.sock.sendto(b'0123\n12000000\0', self.sock_path)
         self.sock.sendto(b'4567\n34000000\0', self.sock_path)
         self.sock.sendto(b'89AB\n56000000\0', self.sock_path)
@@ -28,7 +28,7 @@ class MemoryWatcherTest(unittest.TestCase):
         for actual, expected in zip(self.mw, expecteds):
             self.assertEqual(actual, expected)
 
-    def test_timeout(self):
+    def test_memory_watcher_timeout(self):
         self.assertIsNone(next(self.mw))
 
     def tearDown(self):
