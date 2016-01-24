@@ -6,12 +6,12 @@ from p3.state import Character
 from p3.state import Menu
 from p3.state import Stage
 
-def int_handler(obj, name, mask=0xFFFFFFFF, shift=0, wrapper=None, default=0):
+def int_handler(obj, name, shift=0, mask=0xFFFFFFFF, wrapper=None, default=0):
     """Returns a handler that sets an attribute for a given object.
 
     obj is the object that will have its attribute set. Probably a State.
     name is the attribute name to be set.
-    mask will be applied *before* shifting to the right by shift.
+    shift will be applied before mask.
     Finally, wrapper will be called on the value if it is not None.
 
     This sets the attribute to default when called. Note that the actual final
@@ -19,7 +19,7 @@ def int_handler(obj, name, mask=0xFFFFFFFF, shift=0, wrapper=None, default=0):
     This is particularly useful for enums.
     """
     def handle(value):
-        transformed = (struct.unpack('>i', value)[0] & mask) >> shift
+        transformed = (struct.unpack('>i', value)[0] >> shift) & mask
         wrapped = transformed if wrapper is None else wrapper(transformed)
         setattr(obj, name, wrapped)
     setattr(obj, name, default)
@@ -52,8 +52,8 @@ class StateManager:
         self.addresses = {}
 
         self.addresses['80479D60'] = int_handler(self.state, 'frame')
-        self.addresses['80479d30'] = int_handler(self.state, 'menu', 0xFF, 0, Menu, Menu.Characters)
-        self.addresses['804D6CAC'] = int_handler(self.state, 'stage', 0xFF00, 8, Stage, Stage.Unselected)
+        self.addresses['80479d30'] = int_handler(self.state, 'menu', 0, 0xFF, Menu, Menu.Characters)
+        self.addresses['804D6CAC'] = int_handler(self.state, 'stage', 8, 0xFF, Stage, Stage.Unselected)
 
         self.state.players = []
         for player_id in range(4):
@@ -61,8 +61,8 @@ class StateManager:
             self.state.players.append(player)
 
             type_address = add_address('803F0E08', 0x24 * player_id)
-            type_handler = int_handler(player, 'type', 0xFF000000, 24, PlayerType, PlayerType.Unselected)
-            character_handler = int_handler(player, 'character', 0xFF00, 8, Character, Character.Unselected)
+            type_handler = int_handler(player, 'type', 24, 0xFF, PlayerType, PlayerType.Unselected)
+            character_handler = int_handler(player, 'character', 8, 0xFF, Character, Character.Unselected)
             self.addresses[type_address] = [type_handler, character_handler]
 
     def handle(self, address, value):

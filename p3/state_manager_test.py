@@ -30,7 +30,7 @@ class IntHandlerTest(unittest.TestCase):
     def test_int_handler_shift(self):
         handler = int_handler(self.state, 'attribute', shift=8)
         handler(b'\xF0\xFF\xFF\x0F')
-        self.assertEqual(self.state.attribute, 0xF0FFFF)
+        self.assertEqual(self.state.attribute, 0xFFF0FFFF)
 
     def test_int_handler_wrapper(self):
         wrapper = lambda x: x*x
