@@ -52,7 +52,7 @@ class StateManager:
         self.addresses = {}
 
         self.addresses['80479D60'] = int_handler(self.state, 'frame')
-        self.addresses['80479d30'] = int_handler(self.state, 'menu', 0, 0xFF, Menu, Menu.Characters)
+        self.addresses['80479D30'] = int_handler(self.state, 'menu', 0, 0xFF, Menu, Menu.Characters)
         self.addresses['804D6CAC'] = int_handler(self.state, 'stage', 8, 0xFF, Stage, Stage.Unselected)
 
         self.state.players = []

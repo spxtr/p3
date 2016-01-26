@@ -1,5 +1,6 @@
 import enum
 import math
+import re
 import unittest
 
 from p3.state import State
@@ -109,6 +110,10 @@ class StateManagerTest(unittest.TestCase):
     def test_state_manager_asserts(self):
         with self.assertRaises(AssertionError):
             self.state_manager.handle('missing', 12345)
+
+    def test_state_manager_locations(self):
+        for location in self.state_manager.locations():
+            self.assertIsNotNone(re.fullmatch('[0-9A-F]{8}( [0-9A-F]+)*', location))
 
 if __name__ == '__main__':
     unittest.main()
