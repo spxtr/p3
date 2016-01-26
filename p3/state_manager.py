@@ -5,6 +5,7 @@ from p3.state import PlayerType
 from p3.state import Character
 from p3.state import Menu
 from p3.state import Stage
+from p3.state import ActionState
 
 def int_handler(obj, name, shift=0, mask=0xFFFFFFFF, wrapper=None, default=0):
     """Returns a handler that sets an attribute for a given object.
@@ -64,6 +65,10 @@ class StateManager:
             type_handler = int_handler(player, 'type', 24, 0xFF, PlayerType, PlayerType.Unselected)
             character_handler = int_handler(player, 'character', 8, 0xFF, Character, Character.Unselected)
             self.addresses[type_address] = [type_handler, character_handler]
+
+            state_address = add_address('80453130', 0xE90 * player_id) + ' 70'
+            state_handler = int_handler(player, 'action_state', 0, 0xFFFF, ActionState, ActionState.Unselected)
+            self.addresses[state_address] = state_handler
 
     def handle(self, address, value):
         """Convert the raw address and value into changes in the State."""
