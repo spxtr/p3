@@ -60,15 +60,20 @@ class StateManager:
         for player_id in range(4):
             player = State()
             self.state.players.append(player)
+            data_pointer = add_address('80453130', 0xE90 * player_id)
 
             type_address = add_address('803F0E08', 0x24 * player_id)
             type_handler = int_handler(player, 'type', 24, 0xFF, PlayerType, PlayerType.Unselected)
             character_handler = int_handler(player, 'character', 8, 0xFF, Character, Character.Unselected)
             self.addresses[type_address] = [type_handler, character_handler]
 
-            state_address = add_address('80453130', 0xE90 * player_id) + ' 70'
+            state_address = data_pointer + ' 70'
             state_handler = int_handler(player, 'action_state', 0, 0xFFFF, ActionState, ActionState.Unselected)
             self.addresses[state_address] = state_handler
+
+            ground_address = data_pointer + ' 140'
+            ground_handler = int_handler(player, 'on_ground', 0, 0xFFFF, lambda x: x == 0, True)
+            self.addresses[ground_address] = ground_handler
 
     def handle(self, address, value):
         """Convert the raw address and value into changes in the State."""
