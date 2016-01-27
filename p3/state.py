@@ -336,7 +336,7 @@ class ActionState(enum.Enum):
     CliffClimbSlow          = 0x00FE
     CliffClimbQuick         = 0x00FF
     CliffAttackSlow         = 0x0100
-    liffAttackQuick         = 0x0101
+    CliffAttackQuick        = 0x0101
     CliffEscapeSlow         = 0x0102
     CliffEscapeQuick        = 0x0103
     CliffJumpSlow1          = 0x0104
