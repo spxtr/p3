@@ -13,7 +13,8 @@ def int_handler(obj, name, shift=0, mask=0xFFFFFFFF, wrapper=None, default=0):
     obj is the object that will have its attribute set. Probably a State.
     name is the attribute name to be set.
     shift will be applied before mask.
-    Finally, wrapper will be called on the value if it is not None.
+    Finally, wrapper will be called on the value if it is not None. If wrapper
+    raises ValueError, sets attribute to default.
 
     This sets the attribute to default when called. Note that the actual final
     value doesn't need to be an int. The wrapper can convert int to whatever.
@@ -21,13 +22,7 @@ def int_handler(obj, name, shift=0, mask=0xFFFFFFFF, wrapper=None, default=0):
     """
     def handle(value):
         transformed = (struct.unpack('>i', value)[0] >> shift) & mask
-        wrapped = transformed
-        if wrapper is not None:
-            try:
-                wrapped = wrapper(transformed)
-            except ValueError:
-                wrapped = default
-        setattr(obj, name, wrapped)
+        setattr(obj, name, generic_wrapper(transformed, wrapper, default))
     setattr(obj, name, default)
     return handle
 
@@ -38,14 +33,17 @@ def float_handler(obj, name, wrapper=None, default=0.0):
     """
     def handle(value):
         as_float = struct.unpack('>f', value)[0]
-        if wrapper is not None:
-            try:
-                as_float = wrapper(as_float)
-            except ValueError:
-                as_float = default
-        setattr(obj, name, as_float)
+        setattr(obj, name, generic_wrapper(as_float, wrapper, default))
     setattr(obj, name, default)
     return handle
+
+def generic_wrapper(value, wrapper, default):
+    if wrapper is not None:
+        try:
+            value = wrapper(value)
+        except ValueError:
+            value = default
+    return value
 
 def add_address(x, y):
     """Returns a string representation of the sum of the two parameters.

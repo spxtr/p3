@@ -9,7 +9,12 @@ from p3.state import Character
 from p3.state_manager import StateManager
 from p3.state_manager import int_handler
 from p3.state_manager import float_handler
+from p3.state_manager import generic_wrapper
 from p3.state_manager import add_address
+
+class TestEnum(enum.Enum):
+    ValOne = 1
+    ValTwo = 2
 
 class IntHandlerTest(unittest.TestCase):
     def setUp(self):
@@ -46,12 +51,9 @@ class IntHandlerTest(unittest.TestCase):
         self.assertEqual(self.state.attribute, 8)
 
     def test_int_handler_enum(self):
-        class TestWrapper(enum.Enum):
-            ValOne = 1
-            ValTwo = 2
-        handler = int_handler(self.state, 'attribute', wrapper=TestWrapper)
+        handler = int_handler(self.state, 'attribute', wrapper=TestEnum)
         handler(b'\x00\x00\x00\x02')
-        self.assertEqual(self.state.attribute, TestWrapper.ValTwo)
+        self.assertEqual(self.state.attribute, TestEnum.ValTwo)
 
 class FloatHandlerTest(unittest.TestCase):
     def setUp(self):
@@ -81,6 +83,15 @@ class FloatHandlerTest(unittest.TestCase):
         self.assertFalse(self.state.attribute)
         handler(b'B(\x00\x00')
         self.assertTrue(self.state.attribute)
+
+class GenericWrapperTest(unittest.TestCase):
+    def test_generic_wrapper_basic(self):
+        self.assertEqual(generic_wrapper(1, None, 0), 1)
+        self.assertEqual(generic_wrapper(1, lambda x: 2*x, 0), 2)
+
+    def test_generic_wrapper_enum(self):
+        self.assertEqual(generic_wrapper(1, TestEnum, 0), TestEnum.ValOne)
+        self.assertEqual(generic_wrapper(3, TestEnum, 0), 0)
 
 class AddAddressTest(unittest.TestCase):
     def test_add_address(self):
