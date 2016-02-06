@@ -21,7 +21,12 @@ def int_handler(obj, name, shift=0, mask=0xFFFFFFFF, wrapper=None, default=0):
     """
     def handle(value):
         transformed = (struct.unpack('>i', value)[0] >> shift) & mask
-        wrapped = transformed if wrapper is None else wrapper(transformed)
+        wrapped = transformed
+        if wrapper is not None:
+            try:
+                wrapped = wrapper(transformed)
+            except ValueError:
+                wrapped = default
         setattr(obj, name, wrapped)
     setattr(obj, name, default)
     return handle
@@ -33,7 +38,12 @@ def float_handler(obj, name, wrapper=None, default=0.0):
     """
     def handle(value):
         as_float = struct.unpack('>f', value)[0]
-        setattr(obj, name, as_float if wrapper is None else wrapper(as_float))
+        if wrapper is not None:
+            try:
+                as_float = wrapper(as_float)
+            except ValueError:
+                as_float = default
+        setattr(obj, name, as_float)
     setattr(obj, name, default)
     return handle
 
