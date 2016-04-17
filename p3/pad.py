@@ -30,6 +30,7 @@ class Pad:
     """Writes out controller inputs."""
     def __init__(self, path):
         """Opens the fifo. Blocks until the other end is listening."""
+        self.pipe = None
         try:
             os.mkfifo(path)
         except OSError:
@@ -38,7 +39,8 @@ class Pad:
 
     def __del__(self):
         """Closes the fifo."""
-        self.pipe.close()
+        if self.pipe:
+            self.pipe.close()
 
     def press_button(self, button):
         """Press a button."""
