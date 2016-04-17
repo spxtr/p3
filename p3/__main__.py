@@ -1,5 +1,6 @@
 import os.path
 
+import p3.fox
 import p3.memory_watcher
 import p3.menu_manager
 import p3.pad
@@ -19,6 +20,8 @@ try:
     pad = p3.pad.Pad(dolphin_dir + '/Pipes/p3')
     menu_manager = p3.menu_manager.MenuManager()
 
+    fox = p3.fox.Fox()
+
     while True:
         frame = state.frame
         res = next(mw)
@@ -27,13 +30,12 @@ try:
         if state.frame > frame:
             frame = state.frame
             if state.menu == p3.state.Menu.Game:
-                # The big TODO
-                pass
+                fox.advance(state, pad)
             elif state.menu == p3.state.Menu.Characters:
                 menu_manager.pick_fox(state, pad)
             elif state.menu == p3.state.Menu.Stages:
                 # Handle this once we know where the cursor position is in memory.
-                pass
+                pad.tilt_stick(p3.pad.Stick.C, 0.5, 0.5)
             elif state.menu == p3.state.Menu.PostGame:
                 menu_manager.press_start_lots(state, pad)
 except KeyboardInterrupt:
