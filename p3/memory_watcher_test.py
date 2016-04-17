@@ -2,12 +2,12 @@ import os
 import socket
 import unittest
 
-from p3.memory_watcher import MemoryWatcher
+import p3.memory_watcher
 
 class MemoryWatcherTest(unittest.TestCase):
     def setUp(self):
         self.sock_path = os.getcwd() + '/sock'
-        self.mw = MemoryWatcher(self.sock_path)
+        self.mw = p3.memory_watcher.MemoryWatcher(self.sock_path)
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
 
     def test_memory_watcher_recv(self):

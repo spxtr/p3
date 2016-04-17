@@ -70,6 +70,11 @@ class StateManager:
             self.state.players.append(player)
             data_pointer = add_address('80453130', 0xE90 * player_id)
 
+            cursor_x_address = add_address('81118DEC', -0xB80 * player_id)
+            cursor_y_address = add_address('81118DF0', -0xB80 * player_id)
+            self.addresses[cursor_x_address] = float_handler(player, 'cursor_x')
+            self.addresses[cursor_y_address] = float_handler(player, 'cursor_y')
+
             type_address = add_address('803F0E08', 0x24 * player_id)
             type_handler = int_handler(player, 'type', 24, 0xFF, PlayerType, PlayerType.Unselected)
             character_handler = int_handler(player, 'character', 8, 0xFF, Character, Character.Unselected)

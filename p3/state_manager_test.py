@@ -6,7 +6,7 @@ import unittest
 from p3.state import State
 from p3.state import PlayerType
 from p3.state import Character
-from p3.state_manager import StateManager
+import p3.state_manager
 from p3.state_manager import int_handler
 from p3.state_manager import float_handler
 from p3.state_manager import generic_wrapper
@@ -104,7 +104,7 @@ class AddAddressTest(unittest.TestCase):
 class StateManagerTest(unittest.TestCase):
     def setUp(self):
         self.state = State()
-        self.state_manager = StateManager(self.state)
+        self.state_manager = p3.state_manager.StateManager(self.state)
 
     def test_state_manager_basic(self):
         self.assertEqual(self.state.frame, 0)

@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from p3.pad import Pad
+import p3.pad
 from p3.pad import Button
 from p3.pad import Trigger
 from p3.pad import Stick
@@ -13,7 +13,7 @@ class PadTest(unittest.TestCase):
         os.mkfifo(self.fifo_path)
 
         self.pipe = os.open(self.fifo_path, os.O_RDONLY | os.O_NONBLOCK)
-        self.pad = Pad(self.fifo_path)
+        self.pad = p3.pad.Pad(self.fifo_path)
 
     # Returns whatever is pending in the fifo
     def read_pipe(self):
