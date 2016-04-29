@@ -108,7 +108,7 @@ class StateManagerTest(unittest.TestCase):
 
     def test_state_manager_basic(self):
         self.assertEqual(self.state.frame, 0)
-        self.state_manager.handle('80479D60', b'\x00\x00\x00\x01')
+        self.state_manager.handle('804D7420', b'\x00\x00\x00\x01')
         self.assertEqual(self.state.frame, 1)
 
     def test_state_manager_player(self):

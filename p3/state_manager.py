@@ -60,7 +60,7 @@ class StateManager:
         self.state = state
         self.addresses = {}
 
-        self.addresses['80479D60'] = int_handler(self.state, 'frame')
+        self.addresses['804D7420'] = int_handler(self.state, 'frame')
         self.addresses['80479D30'] = int_handler(self.state, 'menu', 0, 0xFF, Menu, Menu.Characters)
         self.addresses['804D6CAC'] = int_handler(self.state, 'stage', 8, 0xFF, Stage, Stage.Unselected)
 
@@ -83,6 +83,14 @@ class StateManager:
             state_address = data_pointer + ' 70'
             state_handler = int_handler(player, 'action_state', 0, 0xFFFF, ActionState, ActionState.Unselected)
             self.addresses[state_address] = state_handler
+
+            self.addresses[data_pointer + ' 8C'] = float_handler(player, 'facing')
+            self.addresses[data_pointer + ' E0'] = float_handler(player, 'self_air_vel_x')
+            self.addresses[data_pointer + ' E4'] = float_handler(player, 'self_air_vel_y')
+            self.addresses[data_pointer + ' EC'] = float_handler(player, 'attack_vel_x')
+            self.addresses[data_pointer + ' F0'] = float_handler(player, 'attack_vel_y')
+            self.addresses[data_pointer + ' 110'] = float_handler(player, 'pos_x')
+            self.addresses[data_pointer + ' 114'] = float_handler(player, 'pos_y')
 
             ground_address = data_pointer + ' 140'
             ground_handler = int_handler(player, 'on_ground', 0, 0xFFFF, lambda x: x == 0, True)
