@@ -69,7 +69,8 @@ class StateManager:
         for player_id in range(4):
             player = State()
             self.state.players.append(player)
-            data_pointer = add_address('80453130', 0xE90 * player_id)
+
+            self.addresses[add_address('8045310C', 0xE90 * player_id)] = int_handler(player, 'stocks', 8, 0xFF)
 
             cursor_x_address = add_address('81118DEC', -0xB80 * player_id)
             cursor_y_address = add_address('81118DF0', -0xB80 * player_id)
@@ -81,6 +82,7 @@ class StateManager:
             character_handler = int_handler(player, 'character', 8, 0xFF, Character, Character.Unselected)
             self.addresses[type_address] = [type_handler, character_handler]
 
+            data_pointer = add_address('80453130', 0xE90 * player_id)
             self.addresses[data_pointer + ' 70'] = int_handler(player, 'action_state', 0, 0xFFFF, ActionState, ActionState.Unselected)
             self.addresses[data_pointer + ' 8C'] = float_handler(player, 'facing')
             self.addresses[data_pointer + ' E0'] = float_handler(player, 'self_air_vel_x')
