@@ -15,9 +15,14 @@ class PadTest(unittest.TestCase):
         self.pipe = os.open(self.fifo_path, os.O_RDONLY | os.O_NONBLOCK)
         self.pad = p3.pad.Pad(self.fifo_path)
 
+    def tearDown(self):
+        del self.pad
+        os.close(self.pipe)
+        os.unlink(self.fifo_path)
+
     # Returns whatever is pending in the fifo
     def read_pipe(self):
-        return os.read(self.pipe, 256)
+        return os.read(self.pipe, 2048)
 
     def test_buttons_basic(self):
         self.pad.press_button(Button.A)
@@ -78,10 +83,15 @@ class PadTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.pad.tilt_stick(Stick.C, 0.5, 1.5)
 
-    def tearDown(self):
-        del self.pad
-        os.close(self.pipe)
-        os.unlink(self.fifo_path)
+    def test_reset(self):
+        self.pad.reset()
+        output = str(self.read_pipe())
+        for button in p3.pad.Button:
+            self.assertTrue('RELEASE {}'.format(button.name) in output)
+        for trigger in p3.pad.Trigger:
+            self.assertTrue('SET {} 0.00'.format(trigger.name) in output)
+        for stick in p3.pad.Stick:
+            self.assertTrue('SET {} 0.50 0.50'.format(stick.name) in output)
 
 if __name__ == '__main__':
     unittest.main()

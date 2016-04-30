@@ -63,3 +63,11 @@ class Pad:
         assert stick in Stick
         assert 0 <= x <= 1 and 0 <= y <= 1
         self.pipe.write('SET {} {:.2f} {:.2f}\n'.format(stick.name, x, y))
+
+    def reset(self):
+        for button in Button:
+            self.release_button(button)
+        for trigger in Trigger:
+            self.press_trigger(trigger, 0)
+        for stick in Stick:
+            self.tilt_stick(stick, 0.5, 0.5)
