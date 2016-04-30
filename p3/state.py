@@ -464,6 +464,12 @@ class ActionState(enum.Enum):
     ThrownKirbySpitSShot    = 0x017E
     Unselected              = 0x8000
 
+@enum.unique
+class BodyState(enum.Enum):
+    Normal     = 0
+    Invincible = 1
+    Intangible = 2
+
 class State:
     """Databag that is handled by StateManager."""
     pass

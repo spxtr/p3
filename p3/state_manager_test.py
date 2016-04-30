@@ -124,7 +124,7 @@ class StateManagerTest(unittest.TestCase):
 
     def test_state_manager_locations(self):
         for location in self.state_manager.locations():
-            self.assertIsNotNone(re.fullmatch('[0-9A-F]{8}( [0-9A-F]+)*', location))
+            self.assertRegex(location, '[0-9A-F]{7}[048C]( [0-9A-F]*[048C])*')
 
 if __name__ == '__main__':
     unittest.main()

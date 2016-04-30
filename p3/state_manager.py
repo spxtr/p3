@@ -6,6 +6,7 @@ from p3.state import Character
 from p3.state import Menu
 from p3.state import Stage
 from p3.state import ActionState
+from p3.state import BodyState
 
 def int_handler(obj, name, shift=0, mask=0xFFFFFFFF, wrapper=None, default=0):
     """Returns a handler that sets an attribute for a given object.
@@ -80,10 +81,7 @@ class StateManager:
             character_handler = int_handler(player, 'character', 8, 0xFF, Character, Character.Unselected)
             self.addresses[type_address] = [type_handler, character_handler]
 
-            state_address = data_pointer + ' 70'
-            state_handler = int_handler(player, 'action_state', 0, 0xFFFF, ActionState, ActionState.Unselected)
-            self.addresses[state_address] = state_handler
-
+            self.addresses[data_pointer + ' 70'] = int_handler(player, 'action_state', 0, 0xFFFF, ActionState, ActionState.Unselected)
             self.addresses[data_pointer + ' 8C'] = float_handler(player, 'facing')
             self.addresses[data_pointer + ' E0'] = float_handler(player, 'self_air_vel_x')
             self.addresses[data_pointer + ' E4'] = float_handler(player, 'self_air_vel_y')
@@ -91,10 +89,13 @@ class StateManager:
             self.addresses[data_pointer + ' F0'] = float_handler(player, 'attack_vel_y')
             self.addresses[data_pointer + ' 110'] = float_handler(player, 'pos_x')
             self.addresses[data_pointer + ' 114'] = float_handler(player, 'pos_y')
+            self.addresses[data_pointer + ' 140'] = int_handler(player, 'on_ground', 0, 0xFFFF, lambda x: x == 0, True)
+            self.addresses[data_pointer + ' 8F4'] = float_handler(player, 'action_frame')
+            self.addresses[data_pointer + ' 1890'] = float_handler(player, 'percent')
+            self.addresses[data_pointer + ' 19BC'] = float_handler(player, 'hitlag')
+            self.addresses[data_pointer + ' 19C8'] = int_handler(player, 'jumps_used', 0, 0xFF)
+            self.addresses[data_pointer + ' 19EC'] = int_handler(player, 'body_state', 0, 0xFF, BodyState, BodyState.Normal)
 
-            ground_address = data_pointer + ' 140'
-            ground_handler = int_handler(player, 'on_ground', 0, 0xFFFF, lambda x: x == 0, True)
-            self.addresses[ground_address] = ground_handler
 
     def handle(self, address, value):
         """Convert the raw address and value into changes in the State."""
