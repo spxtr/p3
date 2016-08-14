@@ -9,6 +9,7 @@ import p3.state
 import p3.state_manager
 import p3.stats
 
+
 def find_dolphin_dir():
     """Attempts to find the dolphin user directory. None on failure."""
     candidates = ['~/.dolphin-emu', '~/.local/share/.dolphin-emu']
@@ -24,49 +25,56 @@ def write_locations(dolphin_dir, locations):
     with open(path, 'w') as f:
         f.write('\n'.join(locations))
 
-class P3:
-    def __init__(self):
         dolphin_dir = find_dolphin_dir()
         if dolphin_dir is None:
             print('Could not detect dolphin directory.')
             return
 
-        self.state = p3.state.State()
-        self.sm = p3.state_manager.StateManager(self.state)
-        write_locations(dolphin_dir, self.sm.locations())
+def run(state, sm, mw, pad, stats):
+    fox = p3.fox.Fox()
+    mm = p3.menu_manager.MenuManager()
+    while True:
+        last_frame = state.frame
+        res = next(mw)
+        if res is not None:
+            sm.handle(*res)
+        if state.frame > last_frame:
+            stats.add_frames(state.frame - last_frame)
+            start = time.time()
+            make_action(state, pad, mm, fox)
+            stats.add_thinking_time(time.time() - start)
 
-        self.fox = p3.fox.Fox()
-        self.mm = p3.menu_manager.MenuManager()
-        self.stats = p3.stats.Stats()
+def make_action(state, pad, mm, fox):
+    if state.menu == p3.state.Menu.Game:
+        fox.advance(state, pad)
+    elif state.menu == p3.state.Menu.Characters:
+        mm.pick_fox(state, pad)
+    elif state.menu == p3.state.Menu.Stages:
+        # Handle this once we know where the cursor position is in memory.
+        pad.tilt_stick(p3.pad.Stick.C, 0.5, 0.5)
+    elif state.menu == p3.state.Menu.PostGame:
+        mm.press_start_lots(state, pad)
 
-        try:
-            print('Start dolphin now. Press ^C to stop p3.')
-            self.mw = p3.memory_watcher.MemoryWatcher(dolphin_dir + '/MemoryWatcher/MemoryWatcher')
-            self.pad = p3.pad.Pad(dolphin_dir + '/Pipes/p3')
-            self.run()
-        except KeyboardInterrupt:
-            print('Stopped')
-            print(self.stats)
+def main():
+    dolphin_dir = find_dolphin_dir()
+    if dolphin_dir is None:
+        print('Could not find dolphin config dir.')
+        return
 
-    def run(self):
-        while True:
-            last_frame = self.state.frame
-            res = next(self.mw)
-            if res is not None:
-                self.sm.handle(*res)
-            if self.state.frame > last_frame:
-                self.stats.add_frames(self.state.frame - last_frame)
-                self.make_action()
+    state = p3.state.State()
+    sm = p3.state_manager.StateManager(state)
+    write_locations(dolphin_dir, sm.locations())
 
-    def make_action(self):
-        start = time.time()
-        if self.state.menu == p3.state.Menu.Game:
-            self.fox.advance(self.state, self.pad)
-        elif self.state.menu == p3.state.Menu.Characters:
-            self.mm.pick_fox(self.state, self.pad)
-        elif self.state.menu == p3.state.Menu.Stages:
-            # Handle this once we know where the cursor position is in memory.
-            self.pad.tilt_stick(p3.pad.Stick.C, 0.5, 0.5)
-        elif self.state.menu == p3.state.Menu.PostGame:
-            self.mm.press_start_lots(self.state, self.pad)
-        self.stats.add_thinking_time(time.time() - start)
+    stats = p3.stats.Stats()
+
+    try:
+        print('Start dolphin now. Press ^C to stop p3.')
+        mw = p3.memory_watcher.MemoryWatcher(dolphin_dir + '/MemoryWatcher/MemoryWatcher')
+        pad = p3.pad.Pad(dolphin_dir + '/Pipes/p3')
+        run(state, sm, mw, pad, stats)
+    except KeyboardInterrupt:
+        print('Stopped')
+        print(stats)
+
+if __name__ == '__main__':
+    main()
