@@ -30,8 +30,7 @@ def write_locations(dolphin_dir, locations):
             print('Could not detect dolphin directory.')
             return
 
-def run(state, sm, mw, pad, stats):
-    fox = p3.fox.Fox()
+def run(fox, state, sm, mw, pad, stats):
     mm = p3.menu_manager.MenuManager()
     while True:
         last_frame = state.frame
@@ -67,11 +66,14 @@ def main():
 
     stats = p3.stats.Stats()
 
+    fox = p3.fox.Fox()
+
     try:
         print('Start dolphin now. Press ^C to stop p3.')
-        mw = p3.memory_watcher.MemoryWatcher(dolphin_dir + '/MemoryWatcher/MemoryWatcher')
-        pad = p3.pad.Pad(dolphin_dir + '/Pipes/p3')
-        run(state, sm, mw, pad, stats)
+        pad_path = dolphin_dir + '/Pipes/p3'
+        mw_path = dolphin_dir + '/MemoryWatcher/MemoryWatcher'
+        with p3.pad.Pad(pad_path) as pad, p3.memory_watcher.MemoryWatcher(mw_path) as mw:
+            run(fox, state, sm, mw, pad, stats)
     except KeyboardInterrupt:
         print('Stopped')
         print(stats)

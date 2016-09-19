@@ -10,22 +10,26 @@ class MemoryWatcher:
     normal iterator.
     """
     def __init__(self, path):
-        """Creates the socket if it does not exist, and then opens it."""
+        """Deletes the old socket."""
+        self.path = path
         try:
-            os.unlink(path)
+            os.unlink(self.path)
         except OSError:
             pass
+
+    def __enter__(self):
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
         self.sock.settimeout(0.001)
-        self.sock.bind(path)
+        self.sock.bind(self.path)
+        return self
+
+    def __exit__(self, *args):
+        """Closes the socket."""
+        self.sock.close()
 
     def __iter__(self):
         """Iterate over this class in the usual way to get memory changes."""
         return self
-
-    def __del__(self):
-        """Closes the socket."""
-        self.sock.close()
 
     def __next__(self):
         """Returns the next (address, value) tuple, or None on timeout.

@@ -14,9 +14,10 @@ class PadTest(unittest.TestCase):
 
         self.pipe = os.open(self.fifo_path, os.O_RDONLY | os.O_NONBLOCK)
         self.pad = p3.pad.Pad(self.fifo_path)
+        self.pad.__enter__()
 
     def tearDown(self):
-        del self.pad
+        self.pad.__exit__()
         os.close(self.pipe)
         os.unlink(self.fifo_path)
 

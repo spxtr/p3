@@ -8,6 +8,7 @@ class MemoryWatcherTest(unittest.TestCase):
     def setUp(self):
         self.sock_path = os.getcwd() + '/sock'
         self.mw = p3.memory_watcher.MemoryWatcher(self.sock_path)
+        self.mw.__enter__()
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
 
     def test_memory_watcher_recv(self):
@@ -33,7 +34,7 @@ class MemoryWatcherTest(unittest.TestCase):
 
     def tearDown(self):
         self.sock.close()
-        del self.mw
+        self.mw.__exit__()
         os.unlink(self.sock_path)
 
 if __name__ == '__main__':

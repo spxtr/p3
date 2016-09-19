@@ -29,15 +29,20 @@ class Stick(enum.Enum):
 class Pad:
     """Writes out controller inputs."""
     def __init__(self, path):
-        """Opens the fifo. Blocks until the other end is listening."""
+        """Create, but do not open the fifo."""
         self.pipe = None
+        self.path = path
         try:
-            os.mkfifo(path)
+            os.mkfifo(self.path)
         except OSError:
             pass
-        self.pipe = open(path, 'w', buffering=1)
 
-    def __del__(self):
+    def __enter__(self):
+        """Opens the fifo. Blocks until the other side is listening."""
+        self.pipe = open(self.path, 'w', buffering=1)
+        return self
+
+    def __exit__(self, *args):
         """Closes the fifo."""
         if self.pipe:
             self.pipe.close()
